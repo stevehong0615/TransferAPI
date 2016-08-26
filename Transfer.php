@@ -13,6 +13,18 @@ $type = $_GET['type'];
 $amount = $_GET['amount'];
 $user_info = array();
 
+$chinese = "/^([\x7f-\xff]+)$/";
+$en = "/^([0-8A-Za-z]+)$/";
+$number = "/^([0-9]+)$/";
+
+if (!preg_match($en, $userName)) {
+    if (!preg_match($chinese, $userName)) {
+        $user_info = array("massage" => "Input Error!");
+
+        exit(json_encode($user_info));
+    }
+}
+
 $connect = new Connect;
 
 function decodeUnicode($str){
@@ -76,7 +88,7 @@ if ($api == "getBalance" && isset($userName) && $userName != null)
     }
 }
 
-if ($api == "transfer" && isset($userName) && isset($transId) && isset($type) && isset($amount) && $transId != null && $userName != null && $amount != null && $amount >= 0)
+if ($api == "transfer" && isset($userName) && isset($transId) && isset($type) && isset($amount) && $transId != null && $userName != null && $amount != null && $amount >= 0 && preg_match($number, $amount))
 {
     $user = "SELECT `user_name` FROM `transfer_data_a` WHERE `user_name` = :user_name";
     $data = $connect->db->prepare($user);
